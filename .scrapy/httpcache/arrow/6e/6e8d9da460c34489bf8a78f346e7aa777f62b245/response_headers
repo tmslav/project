@@ -1,0 +1,6 @@
+Date: Thu, 31 Dec 2015 12:34:05 GMT
+Set-Cookie: sc_expview=0; domain=.arrow.com; path=/
+Set-Cookie: .ASPXAUTH.arrow=; domain=.arrow.com; expires=Thu, 24-Dec-2015 00:00:00 GMT; path=/
+Server: Bob
+Content-Type: application/json; charset=utf-8
+Cache-Control: private

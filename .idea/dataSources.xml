@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="1895407570">
+    <data-source source="LOCAL" name="MySQL - neuswarm@na-ca-aws-rds-01.cpjskyylvfg2.us-west-1.rds.amazonaws.com" uuid="e2a398d6-85b8-426d-9dfa-cce20ae7eb84">
+      <driver-ref>mysql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://na-ca-aws-rds-01.cpjskyylvfg2.us-west-1.rds.amazonaws.com:3306/neuswarm</jdbc-url>
+      <driver-properties>
+        <property name="zeroDateTimeBehavior" value="convertToNull" />
+        <property name="tinyInt1isBit" value="false" />
+        <property name="characterEncoding" value="utf8" />
+        <property name="characterSetResults" value="utf8" />
+        <property name="yearIsDateType" value="false" />
+      </driver-properties>
+      <libraries />
+    </data-source>
+    <data-source source="LOCAL" name="MySQL - neuswarm_eu@neuswarm-eu.cbv6qdysomih.eu-west-1.rds.amazonaws.com" uuid="50ce1ccb-62b5-4396-8fd3-53eb58cfbc7e">
+      <driver-ref>mysql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://neuswarm-eu.cbv6qdysomih.eu-west-1.rds.amazonaws.com:3306/neuswarm_eu</jdbc-url>
+      <driver-properties>
+        <property name="zeroDateTimeBehavior" value="convertToNull" />
+        <property name="tinyInt1isBit" value="false" />
+        <property name="characterEncoding" value="utf8" />
+        <property name="characterSetResults" value="utf8" />
+        <property name="yearIsDateType" value="false" />
+      </driver-properties>
+      <libraries />
+    </data-source>
+  </component>
+</project>

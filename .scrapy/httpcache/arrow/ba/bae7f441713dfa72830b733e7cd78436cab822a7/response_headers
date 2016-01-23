@@ -1,0 +1,14 @@
+Content-Encoding: gzip
+Set-Cookie: sc_expview=0; domain=.arrow.com; path=/
+Set-Cookie: website#lang=en; domain=.arrow.com; path=/
+Set-Cookie: ASP.NET_SessionId=gn411gx2oxggrio3o3sghvzd; domain=.arrow.com; path=/; HttpOnly
+Set-Cookie: arrowcountrycode="DE"; domain=.arrow.com; expires=Thu, 31-Dec-2015 11:54:45 GMT; path=/
+Set-Cookie: .ASPXAUTH.arrow=; domain=.arrow.com; expires=Thu, 24-Dec-2015 00:00:00 GMT; path=/
+Set-Cookie: SC_ANALYTICS_GLOBAL_COOKIE=f909f77e5b9740c3b5f2395c028851c1|False; domain=.arrow.com; expires=Wed, 31-Dec-2025 11:24:45 GMT; path=/; HttpOnly
+Set-Cookie: arrowcurrency=isocode=USD&culture=en-US; domain=.arrow.com; path=/
+Set-Cookie: arrowcurrency=isocode=USD&culture=en-US; domain=.arrow.com; path=/
+Vary: Accept-Encoding
+Server: Bob
+Cache-Control: private
+Date: Thu, 31 Dec 2015 11:24:45 GMT
+Content-Type: text/html; charset=utf-8

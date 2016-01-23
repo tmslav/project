@@ -1,0 +1,17 @@
+setup.py
+project.egg-info/PKG-INFO
+project.egg-info/SOURCES.txt
+project.egg-info/dependency_links.txt
+project.egg-info/entry_points.txt
+project.egg-info/top_level.txt
+wanda/__init__.py
+wanda/context_factory.py
+wanda/items.py
+wanda/pipelines.py
+wanda/rotate_user_agent.py
+wanda/settings.py
+wanda/spiders/__init__.py
+wanda/spiders/arrow.py
+wanda/spiders/avnet.py
+wanda/spiders/digikey.py
+wanda/spiders/mouser.py

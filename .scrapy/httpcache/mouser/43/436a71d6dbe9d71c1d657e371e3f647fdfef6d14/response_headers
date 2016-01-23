@@ -1,0 +1,11 @@
+Content-Encoding: gzip
+Set-Cookie: ASP.NET_SessionId=yfnux35k05t0j3roevxhzpg4; domain=.mouser.com; path=/; HttpOnly
+Set-Cookie: CARTCOOKIEUUID=8b849a3b-81ac-4a91-9fb4-ad176a863859; domain=.mouser.com; expires=Wed, 28-Dec-2016 10:20:26 GMT; path=/
+Set-Cookie: preferences=pl=en-US&pc_eu=EUR&ps=www2&CNB=1&pc_www2=USDe; domain=.mouser.com; expires=Wed, 28-Dec-2016 10:20:26 GMT; path=/
+Set-Cookie: _op_aixPageId=a2_f1f9a496-ee7c-4873-92f9-827f6ec3b78d-11624-339245; domain=.mouser.com; path=/
+Cache-Control: private
+Vary: Accept-Encoding
+X-Opnet-Transaction-Trace: a2_f1f9a496-ee7c-4873-92f9-827f6ec3b78d-11624-339245
+Date: Mon, 28 Dec 2015 10:20:27 GMT
+X-Frame-Options: SAMEORIGIN
+Content-Type: text/html; charset=utf-8
