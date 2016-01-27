@@ -68,8 +68,8 @@ DOWNLOAD_TIMEOUT = 120
 # Local Overrides
 # ~~~~~~~~~~~~~~~
 
-# try:
-#     from local_settings import *
-#     print "------ imported local settings ----------"
-# except ImportError:
-#     pass
+try:
+    from local_settings import *
+    print "------ imported local settings ----------"
+except ImportError:
+    pass
