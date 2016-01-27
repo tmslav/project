@@ -1,6 +1,6 @@
 __author__ = 'tomislav'
 import functools
-
+from scrapy.exceptions import  CloseSpider
 
 def standard_meta(response, add_dict={}):
     ret = {}
@@ -12,13 +12,14 @@ def standard_meta(response, add_dict={}):
     ret.update(add_dict)
     return ret
 
-def catch_exception(f):
-    @functools.wraps(f)
-    def func(*args, **kwargs):
+def catch_exception(*args,**kwargs):
+    @functools.wraps(args[0])
+    def new_func(spider,response):
+        crawler_function = args[0]
         try:
-            return f(*args, **kwargs)
+            for cc in  crawler_function(spider,response):
+                yield cc
         except Exception as e:
-            print 'Caught an exception in', f.__name__
-            import subprocess
-            subprocess.call(["sudo", "shutdown", "-h", "now"])
-    return func
+            raise CloseSpider
+
+    return new_func

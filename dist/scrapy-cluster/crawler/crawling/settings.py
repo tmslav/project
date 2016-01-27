@@ -45,12 +45,12 @@ ITEM_PIPELINES = {
 SPIDER_MIDDLEWARES = {
     # disable built-in DepthMiddleware, since we do our own
     # depth management per crawl request
-    'scrapy.contrib.spidermiddleware.depth.DepthMiddleware': None,
+    'scrapy.spidermiddlewares.depth.DepthMiddleware': None,
 }
 
 DOWNLOADER_MIDDLEWARES = {
     # Handle timeout retries with the redis scheduler and logger
-    #'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware' : None,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware' : None,
     'crawling.rotate_user_agent.RotateUserAgentMiddleware' :400,
     'crawling.redis_retry_middleware.RedisRetryMiddleware': 510,
 }
@@ -68,7 +68,8 @@ DOWNLOAD_TIMEOUT = 120
 # Local Overrides
 # ~~~~~~~~~~~~~~~
 
-# try:
-#     from localsettings import *
-# except ImportError:
-#     pass
+try:
+    from local_settings import *
+    print "------ imported local settings ----------"
+except ImportError:
+    pass

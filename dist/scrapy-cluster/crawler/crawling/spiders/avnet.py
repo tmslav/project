@@ -18,13 +18,12 @@ class AvnetSpider(RedisSpider):
     site_name = "Avnet"
     base_url = "http://avnetexpress.avnet.com/"
     start_url = "http://avnetexpress.avnet.com/store/em/EMController"
-    drop_count_items = 50000
-    processed_items = 0
 
     # def start_requests(self):
     #     yield Request(
     #         self.start_url
     #     )
+
     @catch_exception
     def parse(self, response):
         links = response.xpath("//script").re("refinementURLs.*'(.*?)\';")
@@ -32,8 +31,10 @@ class AvnetSpider(RedisSpider):
             yield Request(
                 urljoin(self.base_url, link),
                 callback=self.parse_category,
-                meta=standard_meta(response)
+                meta=standard_meta(response),
             )
+
+
     @catch_exception
     def parse_category(self, response):
         subcategories = response.xpath("//span[@class='subcatresultslist']/../@href").extract()

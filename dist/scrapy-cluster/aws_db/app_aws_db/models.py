@@ -15,11 +15,13 @@ QUANTITY_DEFAULT = '-1'
 PRICE_DEFAULT = '-1'
 STOCK_DEFAULT = '0'
 IMAGE_URL_DEFAULT = DATASHEET_LINK_DEFAULT = DESCRIPTION_DEFUALT = 'none'
+CATEGORY_NAMES_DEFAULT = ""
 
 
 class DetailsItem(models.Model):
     class Meta:
         db_table = 'Part'
+
     # define the fields for your item here like:
     site_name = models.CharField(max_length=20)
     site_url = models.CharField(max_length=50)
@@ -36,6 +38,7 @@ class DetailsItem(models.Model):
     packaging = models.CharField(max_length=50, default=PACKAGING_DEFUALT)
     type = models.CharField(max_length=100, default=VERSION_DEFAULT)
     version = models.CharField(max_length=50, default=VERSION_DEFAULT)
+    category_names = models.CharField(max_length=500,default=CATEGORY_NAMES_DEFAULT)
     date_created = models.DateTimeField()
 
 

@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's@q-4p7o0tj517mofs6sc4+b6v3=*by-y5w!a&pcz(%=4)okb8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 USE_TZ = False
 TIME_ZONE = None
 
@@ -35,24 +35,26 @@ ADMIN_ENABLED = False
 
 INSTALLED_APPS = [
     # 'django.contrib.admin',
-    # 'django.contrib.auth',
-    # 'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
-    # 'django.contrib.messages',
-    'app_aws_db'
-    # 'django.contrib.staticfiles',
+     'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django_extensions',
+    'app_aws_db',
+    'ui_validation',
 ]
 
-# MIDDLEWARE_CLASSES = [
-#     'django.middleware.security.SecurityMiddleware',
-#     'django.contrib.sessions.middleware.SessionMiddleware',
-#     'django.middleware.common.CommonMiddleware',
-#     'django.middleware.csrf.CsrfViewMiddleware',
-#     'django.contrib.auth.middleware.AuthenticationMiddleware',
-#     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-#     'django.contrib.messages.middleware.MessageMiddleware',
-#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-# ]
+MIDDLEWARE_CLASSES = [
+ 'django.middleware.security.SecurityMiddleware',
+     'django.contrib.sessions.middleware.SessionMiddleware',
+     'django.middleware.common.CommonMiddleware',
+     'django.middleware.csrf.CsrfViewMiddleware',
+     'django.contrib.auth.middleware.AuthenticationMiddleware',
+     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+     'django.contrib.messages.middleware.MessageMiddleware',
+     'django.middleware.clickjacking.XFrameOptionsMiddleware'
+ ]
 
 ROOT_URLCONF = 'aws_db.urls'
 
@@ -77,15 +79,21 @@ WSGI_APPLICATION = 'aws_db.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+DATABASE_ROUTERS=['router.Router']
 
 DATABASES = {
-    'default': {
+    'storage': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'neuswarm_eu',
         'USER': 'adminroot',
         'PASSWORD': 'pSGAJ7XLBiI7',
         'HOST': 'neuswarm-eu.cbv6qdysomih.eu-west-1.rds.amazonaws.com',
         'PORT': '3306',
+
+    },
+    'default':{
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'yourdatabasename.db'),
     }
 }
 
@@ -120,5 +128,5 @@ USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR+STATIC_URL

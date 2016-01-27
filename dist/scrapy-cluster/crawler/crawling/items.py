@@ -38,12 +38,14 @@ class DetailsItem(scrapy.Item):
     type = scrapy.Field(output_processor=TakeFirst())
     version = scrapy.Field(output_processor=TakeFirst())
     date_created = scrapy.Field(output_processor=TakeFirst())
+    category_names = scrapy.Field()
     inventory_data = scrapy.Field()
     price_data = scrapy.Field()
     def __init__(self,*args,**kwargs):
         super(DetailsItem,self).__init__(*args,**kwargs)
         self['inventory_data'] = []
         self['price_data'] = []
+        self['category_names'] = []
 
 
 class AvailabilityItem(scrapy.Item):

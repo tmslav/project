@@ -4,6 +4,7 @@ import functools
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider
+from crawling.redis_queue import RedisPriorityQueue
 
 
 class ErrorCatcher(type):
@@ -18,15 +19,26 @@ class RedisSpider(Spider):
     '''
     Base Spider for doing distributed crawls coordinated through Redis
     '''
+    redis_conn = None # the redis connection
+    queue = None # the queue to use for crawling
+    spider = None # the spider using this scheduler
+    queue_class = None # the class to use for the queue
+    dupefilter = None # the redis dupefilter
+    item_retries = 0 # the number of extra tries to get an item
+
     def __init__(self,*args,**kwargs):
         super(RedisSpider,self).__init__(*args,**kwargs)
 
     def _set_crawler(cls, crawler):
-        crawler.signals.connect(cls.spider_idle,
-                                        signal=signals.spider_idle)
+        crawler.signals.connect(cls.spider_idle, signal=signals.spider_idle)
+        crawler.signals.connect(cls.engine_stopped, signal=signals.engine_stopped)
 
     def spider_idle(self):
         raise DontCloseSpider("dont_close")
+
+    def engine_stopped(self):
+        import subprocess
+        subprocess.call(["sudo", "shutdown", "-h", "now"])
 
     def parse(self, response):
         '''

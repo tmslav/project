@@ -127,16 +127,15 @@ class DistributedScheduler(object):
         Finds an item from the queue
         '''
         count = 0
-
         while count <= self.item_retries:
             item = self.queue.pop()
             if item:
                 # very basic limiter
-                time.sleep(1)
+                time.sleep(0.2)
                 return item
             # we want the spiders to get slightly out of sync
             # with each other for better performance
-            time.sleep(random.random())
+            time.sleep(random.random()/100)
             count = count + 1
 
         return None
@@ -159,7 +158,7 @@ class DistributedScheduler(object):
                 next_func = item['callback']
             else:
                 next_func = 'parse'
-
+            print next_func
             req.callback = getattr(self.spider,next_func)
 
             if "meta" in item:
