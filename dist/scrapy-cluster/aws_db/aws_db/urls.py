@@ -17,5 +17,5 @@ from django.conf.urls import url,include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r"",include('ui_validation.urls'))
+    url(r"^",include('ui_validation.urls'))
 ]

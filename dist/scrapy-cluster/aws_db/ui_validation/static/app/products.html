@@ -1,0 +1,34 @@
+<div>
+    <h3><font color='white'>{{ search_name }}</font></h3>
+    <h6><font color='white'>{{ timestamp }}</font></h6>
+</div>
+<table class="table-curved table table-responsive table-condensed" style="margin-bottom:0.1%">
+    <thead>
+    <tr>
+        <th>Search Name</th>
+        <th>Part ID</th>
+        <th>Status</th>
+        <th>Site name</th>
+        <th>URL</th>
+        <th>Time & date</th>
+    </tr>
+    </thead>
+    <div><input ng-model="searchText.$" placeholder="Search"
+                style="color:white;font-family:'Open Sans', sans-serif;margin-bottom: 2%"></div>
+    <tbody>
+    <tr ng-repeat="i in (filterItems = (list|filter:searchText))">
+        <td ng-click="click(i)">{{ i.search_name }}</td>
+        <td ng-click="click(i)">{{ i.part_id }}</td>
+        <td ng-click="click(i)">{{ i.status }}</td>
+        <td ng-click="click(i)">{{ i.site_name }}</td>
+        <td ng-click="click(i)"><a href="{{ i.url!='none' ? i.url  : '/app'}}">
+            <span class="{{i.url =='none' || i.url ==''  ? 'not_found':'glyphicon glyphicon-option-horizontal'}}"></span></a>
+        </td>
+
+        <td ng-click="click(i)">{{ i.timestamp }}</td>
+        <!--<td ng-click="click(i)">{{ i.old_price !=-1 && i.new_price!=-1 ? i.percent+"%" : "unknown" }}</td>-->
+        <!--<td><a target="_blank" href="{{ i.url }}">{{ i.url|limitTo:30}}{{ i.url.length>30 ? '...' : '' }}</a></td>-->
+        <!--<td ng-click="click_x($index,i);">X</td>-->
+    </tr>
+    </tbody>
+</table>

@@ -11,19 +11,21 @@ from crawling.items import DetailsItem, AvailabilityItem, PriceItem
 from scrapy.exceptions import CloseSpider
 from redis_spider import RedisSpider
 
-from crawling.spider_utils import standard_meta,catch_exception
+from crawling.spider_utils import standard_meta, catch_exception
+
 
 class AvnetSpider(RedisSpider):
     name = "avnet"
     site_name = "Avnet"
     base_url = "http://avnetexpress.avnet.com/"
     start_url = "http://avnetexpress.avnet.com/store/em/EMController"
+    drop_count_items = 50000
+    processed_items = 0
 
     # def start_requests(self):
     #     yield Request(
     #         self.start_url
     #     )
-
     @catch_exception
     def parse(self, response):
         links = response.xpath("//script").re("refinementURLs.*'(.*?)\';")
@@ -31,9 +33,8 @@ class AvnetSpider(RedisSpider):
             yield Request(
                 urljoin(self.base_url, link),
                 callback=self.parse_category,
-                meta=standard_meta(response),
+                meta=standard_meta(response)
             )
-
 
     @catch_exception
     def parse_category(self, response):
@@ -49,10 +50,12 @@ class AvnetSpider(RedisSpider):
             # pagination
             next_page = response.xpath("//table[@id='pagingTable_top']//a[@title='Next']/@href").extract()
             if next_page:
-                yield Request(urljoin(self.base_url, next_page[0]), callback=self.parse_category,meta=standard_meta(response))
+                yield Request(urljoin(self.base_url, next_page[0]), callback=self.parse_category,
+                              meta=standard_meta(response))
 
             for link in self.parse_overview_for_items(response):
                 yield link
+
     @catch_exception
     def parse_overview_for_items(self, response):
         links = response.xpath("//td[@class='small dataTd']/strong/a/@href").extract()
@@ -64,14 +67,13 @@ class AvnetSpider(RedisSpider):
                 priority=10
             )
 
-
     @catch_exception
     def parse_item(self, response):
         loader_wanda = ItemLoader(item=DetailsItem(), response=response)
         loader_wanda.add_xpath("site_part_id", "//span[@itemprop='sku']/text()")
         loader_wanda.add_value("date_created", self.timestamp())
         loader_wanda.add_value("site_name", self.site_name)
-        loader_wanda.add_xpath("image_url","//img[@id='productMainImage']/@src")
+        loader_wanda.add_xpath("image_url", "//img[@id='productMainImage']/@src")
         loader_wanda.add_value("site_url", self.base_url)
         loader_wanda.add_xpath("manuf_part_id", "//span[@itemprop='sku']/text()")
         loader_wanda.add_xpath("manuf_name", "//strong[@itemprop='manufacturer']/text()")
@@ -122,7 +124,7 @@ class AvnetSpider(RedisSpider):
                         else:
                             price_tmp['quantity'] = '0'
                         price_tmp['date_created'] = self.timestamp()
-                        price_tmp['quantity'] = price_tmp['quantity'].replace("+","").replace(",","")
+                        price_tmp['quantity'] = price_tmp['quantity'].replace("+", "").replace(",", "")
                         loader_wanda.item['price_data'].append(price_tmp)
 
                     avail = AvailabilityItem()
@@ -147,14 +149,15 @@ class AvnetSpider(RedisSpider):
                         loader_wanda.item['inventory_data'].append(avail)
                     else:
                         pass
-                        #logging.error("err1,response.url={}".format(response.url))
+                        # logging.error("err1,response.url={}".format(response.url))
                 else:
-                    pass # no price found
+                    pass  # no price found
 
             except Exception as e:
                 import traceback
                 traceback.print_exc()
-                import ipdb;ipdb.set_trace()
+                import ipdb;
+                ipdb.set_trace()
                 raise e
 
         return loader_wanda.load_item()

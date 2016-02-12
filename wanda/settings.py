@@ -9,7 +9,7 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 LOG_LEVEL='INFO'
-CONCURRENT_REQUESTS=32
+CONCURRENT_REQUESTS=12
 
 BOT_NAME = 'wanda'
 

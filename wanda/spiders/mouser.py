@@ -9,6 +9,7 @@ import scrapy
 from scrapy import Request
 from wanda.items import DetailsItem, AvailabilityItem, PriceItem
 from scrapy.exceptions import CloseSpider
+from scrapy.shell import open_in_browser
 
 PRICE_QUOTE = -1
 FACTORY_LEAD_TIME_DEFAULT = "unknown"
@@ -21,9 +22,7 @@ class MouserSpider(scrapy.Spider):
     base_url = "http://www.mouser.com/"
     base_url2 = "http://www2.mouser.com"
     first_url = "http://www.mouser.com/Electronic-Components/"
-    start_url = "https://www.mouser.com/api/CrossDomain/GetContext?syncDomains=www2&returnUrl=http:%2f%2feu.mouser.com%2flocalsites.aspx&async=False&setPrefSub=True&clearPrefSub=False"
-    drop_count_items = 90000
-    processed_items = 0
+
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Cache-Control': 'no-cache',
@@ -33,78 +32,84 @@ class MouserSpider(scrapy.Spider):
         'Accept-Language': 'en-US,en;q=0.8,hr;q=0.6',
         'Upgrade-Insecure-Requests': '1'
     }
-    def __init__(self,*args,**kwargs):
-        #self.download_delay = 0
-        super(MouserSpider,self).__init__(*args,**kwargs)
+    default_headers = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'en-US,en;q=0.8,hr;q=0.6',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Host': 'mouser.com',
+        'Pragma': 'no-cache',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'
+    }
+    payload = "p=%7B%22appName%22%3A%22Netscape%22%2C%22platform%22%3A%22MacIntel%22%2C%22cookies%22%3A1%2C%22syslang%22%3A%22en-US%22%2C%22userlang%22%3A%22en-US%22%2C%22cpu%22%3A%22%22%2C%22productSub%22%3A%2220030107%22%2C%22setTimeout%22%3A0%2C%22setInterval%22%3A0%2C%22plugins%22%3A%7B%220%22%3A%22WidevineContentDecryptionModule%22%2C%221%22%3A%22ChromePDFViewer%22%2C%222%22%3A%22ShockwaveFlash%22%2C%223%22%3A%22NativeClient%22%2C%224%22%3A%22ChromePDFViewer%22%7D%2C%22mimeTypes%22%3A%7B%220%22%3A%22WidevineContentDecryptionModuleapplication%2Fx-ppapi-widevine-cdm%22%2C%221%22%3A%22application%2Fpdf%22%2C%222%22%3A%22ShockwaveFlashapplication%2Fx-shockwave-flash%22%2C%223%22%3A%22FutureSplashPlayerapplication%2Ffuturesplash%22%2C%224%22%3A%22NativeClientExecutableapplication%2Fx-nacl%22%2C%225%22%3A%22PortableNativeClientExecutableapplication%2Fx-pnacl%22%2C%226%22%3A%22PortableDocumentFormatapplication%2Fx-google-chrome-pdf%22%7D%2C%22screen%22%3A%7B%22width%22%3A1440%2C%22height%22%3A900%2C%22colorDepth%22%3A24%7D%2C%22fonts%22%3A%7B%220%22%3A%22HoeflerText%22%2C%221%22%3A%22Monaco%22%2C%222%22%3A%22Georgia%22%2C%223%22%3A%22TrebuchetMS%22%2C%224%22%3A%22Verdana%22%2C%225%22%3A%22AndaleMono%22%2C%226%22%3A%22Monaco%22%2C%227%22%3A%22CourierNew%22%2C%228%22%3A%22Courier%22%7D%7D"
+
+    def __init__(self, *args, **kwargs):
+        # self.download_delay = 0
+        super(MouserSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
+        headers = deepcopy(self.default_headers)
+        headers['X-Distil-CS'] = 'BYPASS'
         yield Request(
-            self.start_url,
+            self.base_url,
+            headers=headers,
+            meta={'dont_redirect': True}
         )
 
     def parse(self, response):
+        jsurl = response.xpath("//script/@src").extract()[0]
+        url = urljoin(self.base_url, jsurl)
         yield Request(
-            self.first_url,
-            callback=self.parse_1
+            url,
+            callback=self.parse_1,
+            headers=self.default_headers,
         )
 
     def parse_1(self, response):
-        url = "http://www.mouser.com/api/Preferences/SetSubdomain?subdomainName=www2"
-        body = "subdomainName=www2"
-        headers = {"X-Requested-With": "XMLHttpRequest"}
-        return Request(url, body=body, headers=headers, callback=self.parse_2, method='POST')
+        parse_1_headers = deepcopy(self.default_headers)
+        parse_1_headers['X-Distil-Ajax'] = response.headers['X-Ah']
+        jsurl = response.headers['X-Ju']
+
+        return Request(urljoin(self.base_url, jsurl),
+                       headers=parse_1_headers, callback=self.parse_2, body=self.payload, method='POST')
 
     def parse_2(self, response):
-        url = "http://www.mouser.com/api/Preferences/SetCurrency?subdomainName=www2&currencyCode=USDe"
-        body = "subdomainName=www2&currencyCode=USD"
-        headers = {"X-Requested-With": "XMLHttpRequest"}
-        return Request(url, body=body, headers=headers, callback=self.parse_4, method='POST', dont_filter=True, )
+        url_pattern = "distil_identify_cookie.html?uid={}&d_ref=/&qs=".format(response.headers['X-Uid'])
+        body_pattern = "uid={}&d_ref=/&qs=".format(response.headers['X-Uid'])
+        return Request(urljoin(self.base_url, url_pattern), body=body_pattern, headers=self.default_headers,
+                       callback=self.parse_4, method='POST',
+                       meta={'dont_redirect': True, 'handle_httpstatus_list': [302]})
 
     def parse_4(self, response):
-        cookie = map(lambda x: " ".join(x.split()), response.request.headers.get("Cookie").split(";"))
-        # cookie[3]=cookie[3].replace("ps=www&CNB=1","")
-        cookie = 'preferences=pl=en-GB&pc_eu=EUR&ps=www2&CNB=1&pc_www2=zzz'
-        custom_header = deepcopy(self.headers)
-        custom_header['Cookie'] = cookie
-        custom_header['Referer'] = "http://eu.mouser.com/localsites.aspx"
-        return Request("http://www.mouser.com/Electronic-Components/", headers=custom_header, callback=self.parse_5,
-                       meta={'dont_redirect': True, 'handle_httpstatus_list': [302], 'cookiefix': cookie,
-                             'dont_merge_cookies': True},
-                       dont_filter=True, )
+        parse_4_headers = deepcopy(self.default_headers)
+        parse_4_headers['Cookie'] = response.request.headers['Cookie']
+        parse_4_headers['Referer'] = 'http://mouser.com/'
+        return Request(self.base_url.replace("www.", ""), headers=parse_4_headers,
+                       meta={'dont_redirect': True,
+                             'handle_httpstatus_list': [302], },
+                       callback=self.parse_5, dont_filter=True)
 
     def parse_5(self, response):
-        custom_header = deepcopy(self.headers)
-        new_cookies = response.headers.get("Set-Cookie").split(";")[0]
-        custom_header['Cookie'] = "preferences=pl=en-GB&pc_eu=EUR&ps=www2&CNB=1&pc_www2=zzz"
-        custom_header['Referer'] = 'http://eu.mouser.com/localsites.aspx'
-        return Request(response.headers.get("Location"), headers=custom_header, callback=self.parse_6, dont_filter=True,
-                       meta={'dont_redirect': True, 'handle_httpstatus_list': [302], 'dont_merge_cookies': True,
-                             'custom_header': custom_header})
+        import ipdb;ipdb.set_trace()
+        jsurl = response.xpath("//script/@src").extract()[0]
+        url = urljoin(self.base_url, jsurl)
+        yield Request(
+            url,
+            callback=self.parse_6,
+            headers=self.default_headers, dont_filter=True)
 
     def parse_6(self, response):
-        url = response.xpath("//script[@defer]/@src").extract()[0]
-        return Request(urljoin("http://www2.mouser.com/",url), callback=self.parse_7,
-                       headers=response.meta['custom_header'], meta={'dont_redirect': True,'response_headers':response.headers,'headers' : response.request.headers})
-
-    def parse_7(self,response):
-        custom_headers = response.meta['headers']
-        custom_headers['X-Distil-Ajax'] = response.headers['X-Ah']
-        return Request(
-            "http://www2.mouser.com/Electronic-Components/",headers=custom_headers,callback=self.parse_8
-        )
-
-    def parse_8(self, response):
-        links = response.xpath("//li[@class='sub-cat']/a/@href").extract()
-        for link in links:
-            return Request(
-                urljoin(self.base_url2, link).replace("../", ""),
-                callback=self.parse_9
-            )
+        import ipdb;
+        ipdb.set_trace()
 
     def parse_9(self, response):
+        import ipdb;
+        ipdb.set_trace()
         next_url = response.xpath("//a[text()='Next']/@href").extract()
         if next_url:
-            print "next_url",next_url
+            print "next_url", next_url
             yield Request(urljoin(self.base_url2, next_url[0]), self.parse_9)
 
         products = response.xpath("//a[contains(@id,'_lnkMouserPartNumber')]/@href").extract()
@@ -112,7 +117,8 @@ class MouserSpider(scrapy.Spider):
             yield Request(urljoin(self.base_url2, link).replace("../../../../", ""), self.parse_item)
 
     def parse_item(self, response):
-        import ipdb;ipdb.set_trace()
+        import ipdb;
+        ipdb.set_trace()
         try:
             i = DetailsItem()
 
@@ -178,10 +184,12 @@ class MouserSpider(scrapy.Spider):
                         except:
                             continue
                         try:
-                            price_value = min(map(lambda x: float(x.replace(",", "")), div.xpath(".//span").re("\$(.*)\<")))
+                            price_value = min(
+                                map(lambda x: float(x.replace(",", "")), div.xpath(".//span").re("\$(.*)\<")))
                         except:
                             price_value = PRICE_QUOTE
-                        prices.setdefault(price_type if price_type else "default", []).append((quantity, price_value))
+                        prices.setdefault(price_type if price_type else "default", []).append(
+                            (quantity, price_value))
                 else:
                     logging.info("no price for url = {}".format(response.url))
 
@@ -214,19 +222,18 @@ class MouserSpider(scrapy.Spider):
                             ai['factory_leadtime'], ai['factory_lead_uom'] = factory_info_split
                         else:
                             ai['factory_leadtime'], ai['factory_lead_uom'] = (
-                            FACTORY_LEAD_TIME_DEFAULT, FACTORY_LEAD_UOM_DEFAULT)
+                                FACTORY_LEAD_TIME_DEFAULT, FACTORY_LEAD_UOM_DEFAULT)
                     else:
                         logging.warning("no factory_info for url={}".format(response.url), loglevel=logging.INFO)
                     i['inventory_data'].append(ai)
-            self.processed_items+=1
-            if self.processed_items==self.drop_count_items:
+            self.processed_items += 1
+            if self.processed_items == self.drop_count_items:
                 raise CloseSpider("Sample collected")
             return i
         except:
             import traceback
             traceback.print_exc()
             print "cant parse url = {}".format(response.url)
-
 
     def timestamp(self):
         return datetime.datetime.fromtimestamp(time.time()).strftime('%m/%d/%Y %H:%M:%S')

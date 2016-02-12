@@ -45,7 +45,7 @@ class DetailsItem(scrapy.Item):
         super(DetailsItem,self).__init__(*args,**kwargs)
         self['inventory_data'] = []
         self['price_data'] = []
-        self['category_names'] = []
+        self['category_names'] = ""
 
 
 class AvailabilityItem(scrapy.Item):

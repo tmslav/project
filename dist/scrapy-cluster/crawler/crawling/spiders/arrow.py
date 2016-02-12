@@ -12,7 +12,7 @@ from scrapy.shell import open_in_browser as o
 from redis_spider import RedisSpider
 import ujson
 
-from crawling.spider_utils import standard_meta,catch_exception
+from crawling.spider_utils import standard_meta, catch_exception
 
 PRICE_QUOTE = -1
 FACTORY_LEAD_TIME_DEFAULT = "unknown"
@@ -41,20 +41,21 @@ class ArrowSpider(RedisSpider):
     def parse(self, response):
         links = response.xpath("//h2[@class='Sitemap-heading']/a/@href").extract()
         for link in links:
-            yield Request(urljoin(self.base_url, link), callback=self.parse_1, dont_filter=True,meta=standard_meta(response))
+            yield Request(urljoin(self.base_url, link), callback=self.parse_1, dont_filter=True,
+                          meta=standard_meta(response))
 
     @catch_exception
     def parse_1(self, response):
         links = response.xpath("//ul[@class='CategoryListings-subItems']/li/a/@href").extract()
         for link in links:
-            yield Request(urljoin(self.base_url, link), self.parse_2,meta=standard_meta(response))
+            yield Request(urljoin(self.base_url, link), self.parse_2, meta=standard_meta(response))
 
     @catch_exception
     def parse_2(self, response):
         link = response.xpath("//a/@href").re("search\?prodline\=(.*)")
         url_pattern = "https://www.arrow.com/productsearch/searchajax?page={}&q=&prodline={}"
         if link and link[0] != 'Register':
-            yield Request(url_pattern.format(1, link[0]), self.parse_3,meta=standard_meta(response))
+            yield Request(url_pattern.format(1, link[0]), self.parse_3, meta=standard_meta(response))
 
     @catch_exception
     def parse_3(self, response):
@@ -68,7 +69,7 @@ class ArrowSpider(RedisSpider):
             url_pattern = response.url.replace("page=1", "page={}")
 
             for i in range(1, number_of_products + 1):
-                yield Request(url_pattern.format(i), self.parse_4, dont_filter=True,meta=standard_meta(response))
+                yield Request(url_pattern.format(i), self.parse_4, dont_filter=True, meta=standard_meta(response))
 
     @catch_exception
     def parse_4(self, response):
@@ -79,7 +80,8 @@ class ArrowSpider(RedisSpider):
             return
         results = pd['data']['results']
         for result in results:
-            yield Request(urljoin(self.base_url, result['partUrl']), self.parse_item, meta=standard_meta(response,{'pd': result}))
+            yield Request(urljoin(self.base_url, result['partUrl']), self.parse_item,
+                          meta=standard_meta(response, {'pd': result}))
 
     @catch_exception
     def parse_item(self, response):
@@ -105,7 +107,7 @@ class ArrowSpider(RedisSpider):
         i['type'] = TYPE_DEFAULT
         i['date_created'] = self.timestamp()
         url = response.url + "/buyingoptions?cur=USD"
-        return Request(url, self.parse_price, meta=standard_meta(response,{'pd': i}))
+        return Request(url, self.parse_price, meta=standard_meta(response, {'pd': i}))
 
     def parse_price(self, response):
         prices = response.xpath("//dt[@data-quantity and @data-price]")

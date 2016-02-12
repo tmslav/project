@@ -23,11 +23,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 's@q-4p7o0tj517mofs6sc4+b6v3=*by-y5w!a&pcz(%=4)okb8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 USE_TZ = False
 TIME_ZONE = None
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'localhost']
+FILE_UPLOAD_HANDLERS = ["django.core.files.uploadhandler.MemoryFileUploadHandler",
+                        "django.core.files.uploadhandler.TemporaryFileUploadHandler"]
+
+#CELERY SETTTINGS
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 ADMIN_ENABLED = False
 
@@ -35,26 +44,29 @@ ADMIN_ENABLED = False
 
 INSTALLED_APPS = [
     # 'django.contrib.admin',
-     'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    #app
     'app_aws_db',
     'ui_validation',
+    #celery
+    'djcelery'
 ]
 
 MIDDLEWARE_CLASSES = [
- 'django.middleware.security.SecurityMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
-     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',
-     'django.middleware.clickjacking.XFrameOptionsMiddleware'
- ]
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+]
 
 ROOT_URLCONF = 'aws_db.urls'
 
@@ -79,7 +91,7 @@ WSGI_APPLICATION = 'aws_db.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASE_ROUTERS=['router.Router']
+DATABASE_ROUTERS = ['router.Router']
 
 DATABASES = {
     'storage': {
@@ -91,7 +103,7 @@ DATABASES = {
         'PORT': '3306',
 
     },
-    'default':{
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'yourdatabasename.db'),
     }
@@ -129,4 +141,4 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR+STATIC_URL
+STATIC_ROOT = BASE_DIR + STATIC_URL

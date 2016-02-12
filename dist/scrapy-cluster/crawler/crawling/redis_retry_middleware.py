@@ -11,8 +11,7 @@ class RedisRetryMiddleware(RetryMiddleware):
                                             port=settings.get('REDIS_PORT'))
 
     def _retry(self, request, reason, spider):
-        self.queue = RedisPriorityQueue(self.redis_conn,
-                                        self.spider.name + ":queue")
+
         retries = request.meta.get('retry_times', 0) + 1
         if retries <= self.max_retry_times:
             log.msg(format="Retrying %(request)s " \
@@ -26,7 +25,9 @@ class RedisRetryMiddleware(RetryMiddleware):
             retryreq.meta['priority'] = retryreq.meta['priority'] - 10
             return retryreq
         else:
+            self.queue = RedisPriorityQueue(self.redis_conn,spider.name + ":queue")
             log.msg("Putting back to redis queue %(request)",level=log.INFO,request=request)
+            request.dont_filter=True
             req_dict = self.request_to_dict(request)
             self.queue.push(req_dict, req_dict['meta']['priority']/2)
             log.msg(format="Gave up retrying %(request)s "\

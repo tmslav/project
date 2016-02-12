@@ -17,9 +17,8 @@ def catch_exception(*args,**kwargs):
     def new_func(spider,response):
         crawler_function = args[0]
         try:
-            for cc in  crawler_function(spider,response):
-                yield cc
+            return crawler_function(spider,response)
         except Exception as e:
+            import ipdb;ipdb.set_trace()
             raise CloseSpider
-
     return new_func

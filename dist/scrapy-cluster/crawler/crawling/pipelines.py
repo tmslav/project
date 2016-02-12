@@ -64,13 +64,13 @@ class KafkaPipeline(object):
 class MySQLStoreToAmazonPipeline(object):
 
     def process_item(self, item, spider):
-        return deferToThread(self._proces_item,item,spider)
+        return self._proces_item(item,spider)
 
     def _proces_item(self,item,spider):
         filtered = {k:v for k,v in item.iteritems() if k!='inventory_data' and k!='price_data' }
-        item1=DetailsItem.objects.get_or_create(**filtered)
+        item1=DetailsItem.objects.create(**filtered)
         for i in item['inventory_data']:
-            item2 = AvailabilityItem.objects.get_or_create(**i)
+            item2 = AvailabilityItem.objects.create(**i)
         for i in item['price_data']:
-            item3 = PriceItem.objects.get_or_create(**i)
+            item3 = PriceItem.objects.create(**i)
         return item

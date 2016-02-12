@@ -1,26 +1,70 @@
+<div class='container'>
+    <h3><font color='white'>Parts Search</font></h3>
+    <h6><font color='white'>Landing page</font></h6>
+</div>
 <table class="table-curved table table-responsive table-condensed" style="margin-bottom:0.1%">
-            <thead>
-            <tr>
-                <th>Parts Searched</th>
-                <th>Parts Found</th>
-                <th>Parts not found</th>
-                <th>Percent</th>
-                <th>URL</th>
-                <th>Time & date</th>
-                <th></th>
-            </tr>
-            </thead>
-            <div><input ng-model="searchText.$" placeholder="Search" style="color:white;font-family:'Open Sans', sans-serif;margin-bottom: 2%"></div>
-            <tbody >
-            <tr ng-repeat="i in (filterItems = (lists|filter:searchText))" >
-                 <td ng-click="click(i)">{{ i.name|limitTo:30}}{{ i.name.length>30 ? '...' : '' }}</td>
-                 <td ng-click="click(i)">{{i.new_price != -1 ? '$'+i.new_price : "no price"}}</td>
-                 <td ng-click="click(i)">{{ i.old_price != -1 ? '$'+i.old_price:'no price'}}</td>
-                 <td ng-click="click(i)">{{ i.old_price !=-1 && i.new_price!=-1 ? i.percent+"%" : "unknown"  }}</td>
-                 <td ng-click="click(i)">{{ i.updated }}</td>
-                 <td ><a target="_blank" href="{{ i.url }}">{{ i.url|limitTo:30}}{{ i.url.length>30 ? '...' : '' }}</a></td>
-                 <td ng-click="click_x($index,i);">X</td>
-            </tr>
-            </tbody>
-        </table>
-        <a ng-href="#/add"><button class="btn" style="min-width: 100%;max-width: 100%;background: #282828;color: darkkhaki;" ng-href="#/add">+</button></a>
+    <thead>
+    <tr>
+        <th>Status</th>
+        <th>Search name</th>
+        <th>Time & date</th>
+        <th>Parts found in RDS</th>
+        <th>Parts send to HitList</th>
+        <th>Parts found by Hitlist and added to RDS</th>
+        <th>Parts not found added to Find List</th>
+        <th>Percent</th>
+        <th>#In Queue</th>
+        <th>URL</th>
+    </tr>
+    </thead>
+    <div><input ng-model="searchText.$" placeholder="Search"
+                style="color:white;font-family:'Open Sans', sans-serif;margin-bottom: 2%"></div>
+    <tbody>
+    <tr ng-repeat="i in (filterItems = (list|filter:searchText))">
+        <td>{{i.status}}</td>
+        <td>{{ i.search_name }}</td>
+        <td>{{ i.timestamp }}</td>
+        <td>{{ i.parts_found_in_rds }}</td>
+        <td>{{ i.parts_send_to_hitlist }}</td>
+        <td>{{ i.parts_found_by_hitlist_add_to_rds }}</td>
+        <td>{{ i.parts_not_found }}</td>
+        <td>{{ i.percent_found+" %" }}</td>
+        <td>{{ i.in_queue }}</td>
+        <td><a href="#items/{{ i.resultid }}"><span class="glyphicon glyphicon-option-horizontal"></span></a></td>
+        <!--<td ng-click="click(i)">{{ i.old_price !=-1 && i.new_price!=-1 ? i.percent+"%" : "unknown" }}</td>-->
+        <!--<td><a target="_blank" href="{{ i.url }}">{{ i.url|limitTo:30}}{{ i.url.length>30 ? '...' : '' }}</a></td>-->
+        <!--<td ng-click="click_x($index,i);">X</td>-->
+    </tr>
+    </tbody>
+</table>
+<button type="button" class="btn" style="min-width: 100%;max-width: 100%;background: #282828;color:whitesmoke;"
+        data-toggle="modal" data-target="#myModal">Add CSV
+</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content well">
+            <form class='form-inline' action="/upload/" method="post" enctype="multipart/form-data">
+
+                <input class='form-control' style="min-width: 100%;background: #FFFFFF" placeholder='Search Name'
+                       name='search_name'>
+                <label class="btn btn-primary" for="my-file-selector"
+                       style='background: #235EC7;margin-top:1px;min-width: 100%'>
+                    <input id="my-file-selector" accept=".csv" type="file" name="name" style='display:none'
+                           onchange="javascript:this.form.submit();">
+                    Upload CSV
+                </label>
+                <button style='background: #235EC7;margin-top:1px;min-width: 100%' type="button" class="btn btn-info"
+                        data-dismiss="modal">Close
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</div>
