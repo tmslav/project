@@ -2,6 +2,7 @@ import sys
 sys.path.append('../../aws_db/')
 
 import os
+import urllib
 os.environ['DJANGO_SETTINGS_MODULE'] = 'aws_db.settings'
 import django
 django.setup()
@@ -13,6 +14,10 @@ REDIS_PORT = '6379'
 KAFKA_HOSTS = '52.90.105.198'
 KAFKA_TOPIC_PREFIX = 'demo'
 LOG_LEVEL="INFO"
+
+MACHINE_IP = urllib.urlopen("http://ip.42.pl/raw").read()
+
+ERROR_REPORT_MAIL = ["tmslav@gmail.com"]
 
 # Scrapy Settings
 # ~~~~~~~~~~~~~~~
@@ -45,30 +50,20 @@ ITEM_PIPELINES = {
 SPIDER_MIDDLEWARES = {
     # disable built-in DepthMiddleware, since we do our own
     # depth management per crawl request
-    'scrapy.contrib.spidermiddleware.depth.DepthMiddleware': None,
+    'scrapy.spidermiddlewares.depth.DepthMiddleware': None,
 }
 
 DOWNLOADER_MIDDLEWARES = {
     # Handle timeout retries with the redis scheduler and logger
-    #'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware' : None,
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware' : None,
     'crawling.rotate_user_agent.RotateUserAgentMiddleware' :400,
     'crawling.redis_retry_middleware.RedisRetryMiddleware': 510,
 }
-CONCURRENT_REQUESTS=32
+EXTENSIONS = {
+    'scrapy.extensions.corestats.CoreStats': 500,
+}
+CLOSESPIDER_ERRORCOUNT = 2
+CONCURRENT_REQUESTS_PER_IP = 5
+CONCURRENT_REQUESTS=5
 # Disable the built in logging in production
 LOG_ENABLED = True
-
-# Allow all return codes
-HTTPERROR_ALLOW_ALL = True
-
-RETRY_TIMES = 3
-
-DOWNLOAD_TIMEOUT = 120
-
-# Local Overrides
-# ~~~~~~~~~~~~~~~
-
-# try:
-#     from localsettings import *
-# except ImportError:
-#     pass

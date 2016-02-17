@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
 
 # Define your item pipelines here
-from twisted.internet.threads import deferToThread
 
 import json
 import datetime as dt
-import time
 
-import logging
-
+import redis
 from kafka import KafkaClient, SimpleProducer
+from crawling.redis_queue import RedisPriorityQueue
+from app_aws_db.models import AvailabilityItem, DetailsItem, PriceItem
 
-from crawling.items import RawResponseItem
-
-from app_aws_db.models import AvailabilityItem,DetailsItem,PriceItem
 
 class KafkaPipeline(object):
-
     """Pushes serialized item to appropriate Kafka topics."""
 
     def __init__(self, producer, topic_prefix, aKafka):
@@ -41,7 +36,7 @@ class KafkaPipeline(object):
         datum["timestamp"] = dt.datetime.utcnow().isoformat()
         prefix = self.topic_prefix
         appid_topic = "{prefix}.crawled_{appid}".format(prefix=prefix,
-                                                       appid=datum["appid"])
+                                                        appid=datum["appid"])
         firehose_topic = "{prefix}.crawled_firehose".format(prefix=prefix)
         try:
             message = json.dumps(datum)
@@ -61,14 +56,33 @@ class KafkaPipeline(object):
             self.kafka.ensure_topic_exists(topicName)
             self.topic_list.append(topicName)
 
+
 class MySQLStoreToAmazonPipeline(object):
+    def __init__(self, redis_conn):
+        self.redis_conn = redis_conn
+
+    @classmethod
+    def from_settings(cls, settings):
+        REDIS_HOST = settings.get("REDIS_HOST")
+        REDIS_PORT = settings.get("REDIS_PORT")
+        redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+        return cls(redis_conn)
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls.from_settings(crawler.settings)
 
     def process_item(self, item, spider):
-        return self._proces_item(item,spider)
+        # return deferToThread(self._proces_item,item,spider)
+        return self._proces_item(item, spider)
 
-    def _proces_item(self,item,spider):
-        filtered = {k:v for k,v in item.iteritems() if k!='inventory_data' and k!='price_data' }
-        item1=DetailsItem.objects.create(**filtered)
+    def _proces_item(self, item, spider):
+        filtered = {k: v for k, v in item.iteritems() if k != 'inventory_data' and k != 'price_data' and k != 'hitlist'}
+        item1 = DetailsItem.objects.create(**filtered)
+        if item.get("hitlist"):
+            queue = RedisPriorityQueue(self.redis_conn, item.get("hitlist") + ":results")
+            queue.push(item, 100)
+
         for i in item['inventory_data']:
             item2 = AvailabilityItem.objects.create(**i)
         for i in item['price_data']:

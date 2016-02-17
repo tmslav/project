@@ -42,6 +42,7 @@ class ArrowSpider(scrapy.Spider):
     processed_items = 0
 
     def start_requests(self):
+        import ipdb;ipdb.set_trace()
         yield Request(self.start_url)
 
     def parse(self, response):

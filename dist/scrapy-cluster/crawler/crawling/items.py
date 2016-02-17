@@ -2,22 +2,8 @@
 
 # Define here the models for your scraped items
 
-from scrapy import Item, Field
 import scrapy
 from scrapy.loader.processors import TakeFirst
-
-class RawResponseItem(Item):
-    appid = Field()
-    crawlid = Field()
-    url = Field()
-    response_url = Field()
-    status_code = Field()
-    status_msg = Field()
-    headers = Field()
-    body = Field()
-    links = Field()
-    attrs = Field()
-
 
 
 class DetailsItem(scrapy.Item):
@@ -41,8 +27,9 @@ class DetailsItem(scrapy.Item):
     category_names = scrapy.Field()
     inventory_data = scrapy.Field()
     price_data = scrapy.Field()
-    def __init__(self,*args,**kwargs):
-        super(DetailsItem,self).__init__(*args,**kwargs)
+
+    def __init__(self, *args, **kwargs):
+        super(DetailsItem, self).__init__(*args, **kwargs)
         self['inventory_data'] = []
         self['price_data'] = []
         self['category_names'] = ""
@@ -57,6 +44,7 @@ class AvailabilityItem(scrapy.Item):
     factory_leadtime = scrapy.Field(output_processor=TakeFirst())
     factory_lead_uom = scrapy.Field(output_processor=TakeFirst())
     other_text = scrapy.Field(output_processor=TakeFirst())
+
 
 class PriceItem(scrapy.Item):
     site_name = scrapy.Field(output_processor=TakeFirst())
