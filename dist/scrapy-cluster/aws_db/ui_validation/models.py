@@ -11,6 +11,7 @@ class Results(models.Model):
 	parts_not_found = models.IntegerField(default=0)
 	percent_found = models.IntegerField(default=0)
 	in_queue = models.IntegerField(default=0)
+	retry = models.IntegerField(default=20)
 
 class DetailModel(models.Model):
 	id = models.AutoField(primary_key=True)
